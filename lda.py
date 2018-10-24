@@ -25,7 +25,7 @@ class LDA:
 
 
     def estimate_sigma(self):
-        """ Estimation of sgima """
+        """ Estimation of sigma """
         mu_0 = self.mu_0
         mu_1 = self.mu_1
         if mu_0 is None or mu_1 is None:
@@ -47,7 +47,7 @@ class LDA:
         self.estimate_sigma()
 
     def predict(self, x):
-        """ Returns the p(y=1|x) """
+        """ Returns p(y=1|x) """
         mu_0 = self.mu_0
         mu_1 = self.mu_1
         sigma = self.sigma
@@ -55,22 +55,27 @@ class LDA:
         pi = self.pi
         mu = mu_0.T.dot(inv_sigma).dot(mu_0) - mu_1.T.dot(inv_sigma).dot(mu_1)
         a_tilde = 0.5 * mu + np.log(pi) - np.log(1 - pi)
-        b_tilde = 0.5 * (mu_1.T.dot(inv_sigma) - mu_0.T.dot(inv_sigma))
+        b_tilde = mu_1.T.dot(inv_sigma) - mu_0.T.dot(inv_sigma)
         res = np.exp(a_tilde + b_tilde.dot(x.T) + x.dot(b_tilde))
-        res /= (1 + np.exp(a_tilde + b_tilde.dot(x.T) + x.dot(b_tilde)))
+        res /= (1 + np.exp(a_tilde + b_tilde.dot(x.T)))
         return res
 
     def plot_boundary(self, N=100):
-
+        """ Plot the boundary of the model """
         mu_0 = self.mu_0
         mu_1 = self.mu_1
         pi = self.pi
         inv_sigma = np.linalg.inv(self.sigma)
+
         mu = mu_0.T.dot(inv_sigma).dot(mu_0) - mu_1.T.dot(inv_sigma).dot(mu_1)
         a_tilde = 0.5 * mu + np.log(pi) - np.log(1 - pi)
+
         b_tilde = 0.5 * (mu_1.T.dot(inv_sigma) - mu_0.T.dot(inv_sigma))
-        xmin = min(self.x[:,0])
-        xmax = max(self.x[:,0])
+        xmin = min(self.x[:,0]) - 2
+        xmax = max(self.x[:,0]) + 2
+        ymin = min(self.x[:,1]) - 2
+        ymax = max(self.x[:,1]) + 2
         x_1 = np.linspace(xmin,xmax,N)
         x_2 = (-1  * a_tilde - 2 * b_tilde[0] * x_1) / (2 * b_tilde[1])
         plt.plot(x_1, x_2)
+        plt.ylim(top=ymax, bottom=ymin)

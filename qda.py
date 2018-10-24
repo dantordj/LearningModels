@@ -58,7 +58,7 @@ class QDA():
         self.estimate_sigma(1)
 
     def predict(self,x):
-        """ Return y = wx + b """
+        """ Return p(y=1|x) """
         pi = self.pi
         mu_0 = self.mu_0
         mu_1 = self.mu_1
@@ -68,6 +68,7 @@ class QDA():
         inv_sigma_1 = np.linalg.inv(sigma_1)
         det_sigma_0 = np.linalg.det(sigma_0)
         det_sigma_1 = np.linalg.det(sigma_1)
+
 
         X1 = -1 / 2 * (x - mu_1).T.dot(inv_sigma_1).dot(x - mu_1)
         X0 = -1 / 2 * (x - mu_0).T.dot(inv_sigma_0).dot(x - mu_0)
@@ -79,7 +80,7 @@ class QDA():
 
 
     def plot_boundary(self, N=100):
-
+        """ Plot the boundary of the model """
         pi = self.pi
         mu_0, mu_1 = self.mu_0, self.mu_1
         sigma_0, sigma_1 = self.sigma_0, self.sigma_1
@@ -90,18 +91,17 @@ class QDA():
         det_sigma_1 = np.linalg.det(sigma_1)
 
         # Equation of the boundary : tZAZ + 2tZB + c = 0
-
         A = (inv_sigma_0 - inv_sigma_1)
         B = (inv_sigma_1.dot(mu_1) - inv_sigma_0.dot(mu_0))
         c = mu_0.T.dot(inv_sigma_0).dot(mu_0) - mu_1.T.dot(inv_sigma_1).dot(mu_1)
         c += (2 * math.log(pi / (1 - pi)) - math.log(det_sigma_0) + math.log(det_sigma_1))
 
-        min_x1 = min(self.x[:,0])
-        max_x1 = max(self.x[:,0])
-        min_x2 = min(self.x[:,1]) - 2
-        max_x2 = max(self.x[:,1])
-        x1 = np.linspace(min_x1, max_x1, N)
-        x2 = np.linspace(min_x2, max_x2, N)
+        xmin = min(self.x[:,0]) - 2
+        xmax = max(self.x[:,0]) + 2
+        ymin = min(self.x[:,1]) - 2
+        ymax = max(self.x[:,1]) + 2
+        x1 = np.linspace(xmin, xmax, N)
+        x2 = np.linspace(ymin, ymax, N)
 
         X, Y = np.meshgrid(x1,x2)
 
